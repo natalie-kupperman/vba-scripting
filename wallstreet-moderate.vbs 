@@ -1,0 +1,106 @@
+sub wallstreetmoderate():
+Dim ws As Worksheet
+
+    'create a for each loop
+    For Each ws In Worksheets
+
+        'create column headers for new variables
+        ws.Range("I1") = "Ticker Name"
+        ws.Range("J1") = "Yearly Change"
+        ws.Range("K1") = "Percent Change"
+        ws.Range("L1") = "Total Volume"
+
+        'set an initial variable for holding the ticker name
+        Dim tickername As String
+
+        'set an initial variable for holding the total volume per ticker
+        Dim volumetotal As Double
+        volumetotal = 0
+
+        'set an initial variable for holding yearly change per ticker
+        Dim yearchange As Double
+
+        'keep track of the location for each ticker in the summary table
+        Dim summarytablerow As Integer
+        summarytablerow = 2
+
+        'set initial variable to hold open value for ticker
+        Dim openvalue As Double
+      
+        'set initial variable to hold close value for ticker
+        Dim closevalue As Double
+        
+        'set percent change variable
+        Dim percentchange As Double
+
+        'create last row variable
+        Dim lastrow As Long
+        lastrow = Cells(Rows.Count, 1).End(xlUp).Row
+
+            'loop through rows
+            For i = 2 To lastrow
+
+                'check if we are still within the same ticker
+                If ws.Cells(i + 1, 1).Value <> ws.Cells(i, 1).Value Then
+
+                'set the ticker name
+                tickername = ws.Cells(i, 1).Value
+
+                'add to the volume total
+                volumetotal = volumetotal + ws.Cells(i, 7).Value
+
+                'create ticker count
+                tickercount = Application.WorksheetFunction.CountIf(Range("A:A"), Cells(i, 1).Value)
+
+                'find open value
+                openvalue = ws.cells(i - tickercount + 1, 3)
+            
+                'find closing value
+                closevalue = ws.Cells(i, 6).Value
+
+                'calculate yearly change
+                yearchange = closevalue - openvalue
+
+                'calculate percent change
+                percentchange = (1 - (closevalue / openvalue)) * 100
+
+                'print ticker name in the summary table
+                ws.Range("I" & summarytablerow).Value = tickername
+
+                'print yearly change in the summary table
+                ws.Range("J" & summarytablerow).Value = yearchange
+
+                'set negative changes to red
+                    If yearchange < 0 Then
+                        ws.Range("J" & summarytablerow).Interior.ColorIndex = 3
+                
+                    'set positive changes to green
+                    Else
+                        ws.Range("J" & summarytablerow).Interior.ColorIndex = 4
+                    End If
+
+                'print percent change to the summary table
+                ws.Range("K" & summarytablerow).Value = percentchange & "%"
+
+                'print the ticker volume to the summary table
+                ws.Range("L" & summarytablerow).Value = volumetotal
+
+                'add one row to the summary table
+                summarytablerow = summarytablerow + 1
+
+                'reset the volume total
+                volumetotal = 0
+
+                'if the cell immediatley following a row is the same ticker
+            Else
+
+                'add the volume total
+                volumetotal = volumetotal + ws.Cells(i, 3).Value
+
+            End If
+
+        Next i
+
+    Next ws
+
+End Sub
