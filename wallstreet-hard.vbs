@@ -94,7 +94,7 @@ sub wallstreethard():
                 yearchange = closevalue - openvalue
 
                 'calculate percent change 
-                percentchange = (1-(closevalue/openvalue)) * 100
+                percentchange = (((closevalue - openvalue)/openvalue) * 100)
 
                     'find company with greatest % increase
                     if percentchange > greatestpercentincrease then
